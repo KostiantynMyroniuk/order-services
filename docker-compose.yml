@@ -1,0 +1,34 @@
+services:
+  catalog.api:
+    image: ${DOCKER_REGISTRY-}catalogapi
+    build:
+      context: .
+      dockerfile: src/Catalog.API/Dockerfile
+
+  basket.api:
+    image: ${DOCKER_REGISTRY-}basketapi
+    build:
+      context: .
+      dockerfile: src/Basket.API/Dockerfile
+
+
+  identityapi:
+    image: ${DOCKER_REGISTRY-}identityapi
+    build:
+      context: .
+      dockerfile: src/Identity,API/Dockerfile
+
+
+  notifications.api:
+    image: ${DOCKER_REGISTRY-}notificationsapi
+    build:
+      context: .
+      dockerfile: src/Notifications.API/Dockerfile
+
+
+  orders.api:
+    image: ${DOCKER_REGISTRY-}ordersapi
+    build:
+      context: .
+      dockerfile: src/Orders.API/Dockerfile
+
