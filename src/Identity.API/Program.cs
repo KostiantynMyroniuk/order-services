@@ -1,5 +1,5 @@
-using Identity_API.Apis;
-using Identity_API.Extensions;
+using Identity.API.Apis;
+using Identity.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

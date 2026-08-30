@@ -1,9 +1,9 @@
-﻿using Identity_API.Infrastructure.Services;
-using Identity_API.Models;
+﻿using Identity.API.Infrastructure.Services;
+using Identity.API.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 
-namespace Identity_API.Apis
+namespace Identity.API.Apis
 {
     public static class IdentityApi
     {

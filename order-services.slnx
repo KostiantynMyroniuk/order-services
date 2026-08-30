@@ -1,17 +1,18 @@
 <Solution>
-  <Folder Name="/Apis/">
+  <Folder Name="/Solution Items/">
+    <File Path=".env" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/src/">
     <Project Path="src/Basket.API/Basket.API.csproj" Id="41b6ad86-1da3-4e9e-838b-fcaa1d11a229" />
     <Project Path="src/Catalog.API/Catalog.API.csproj" Id="1c71e854-c9fc-47ef-aa77-456b77681879" />
-    <Project Path="src/Identity,API/Identity,API.csproj" Id="29b8c8b8-5602-4615-ba8d-34ab63241372" />
-    <Project Path="src/Notifications.API/Notifications.API.csproj" Id="041b92ef-11ee-40ff-a15a-ca1d50a83593" />
+    <Project Path="src/Identity.API/Identity.API.csproj" />
+    <Project Path="src/Notification.Worker/Notification.Worker.csproj" Id="5b62b947-ebe9-4141-ae69-36ecb7d2beb1" />
     <Project Path="src/Orders.API/Orders.API.csproj" Id="9f5166b0-ce3b-432e-807d-68882b24689b" />
-  </Folder>
-  <Folder Name="/Solution Items/">
-    <File Path="Directory.Packages.props" />
+    <Project Path="src/Shared/Shared.csproj" Id="d5d16ea6-5b47-48db-80e4-c92e82fc1ad3" />
   </Folder>
   <Folder Name="/tests/" />
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>
-  <Project Path="src/Shared/Shared.csproj" Id="d5d16ea6-5b47-48db-80e4-c92e82fc1ad3" />
 </Solution>

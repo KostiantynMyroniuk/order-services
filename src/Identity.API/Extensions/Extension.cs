@@ -1,16 +1,16 @@
-﻿using Identity_API.Infrastructure;
-using Identity_API.Infrastructure.Services;
-using Identity_API.Models;
-using Identity_API.Models.Options;
+﻿using Identity.API.Infrastructure;
+using Identity.API.Infrastructure.Services;
+using Identity.API.Models;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Shared.Extensions;
+using Shared.Models;
 using System.Text;
 
-namespace Identity_API.Extensions
+namespace Identity.API.Extensions
 {
     public static class Extension
     {

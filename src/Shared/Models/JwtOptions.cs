@@ -1,4 +1,4 @@
-﻿namespace Identity_API.Models.Options
+﻿namespace Shared.Models
 {
     public sealed class JwtOptions
     {

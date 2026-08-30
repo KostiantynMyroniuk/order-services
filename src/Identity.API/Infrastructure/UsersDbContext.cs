@@ -1,8 +1,9 @@
-﻿using Identity_API.Models;
+﻿using Identity.API.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
-namespace Identity_API.Infrastructure
+namespace Identity.API.Infrastructure
 {
     public class UsersDbContext : IdentityDbContext
     {
@@ -14,6 +15,8 @@ namespace Identity_API.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            base.OnModelCreating(builder);
+
             builder.HasDefaultSchema("identity");
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace Identity_API.Models
+﻿namespace Identity.API.Models
 {
     public class RefreshToken
     {

@@ -1,15 +1,15 @@
-﻿using Identity_API.Models;
-using Identity_API.Models.Options;
+﻿using Identity.API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Shared.Models;
 using System.Buffers.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Identity_API.Infrastructure.Services
+namespace Identity.API.Infrastructure.Services
 {
     public interface ITokenProvider
     {
