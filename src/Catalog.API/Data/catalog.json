@@ -1,0 +1,62 @@
+﻿[
+  {
+    "Id": "da25aefd-0393-4856-8883-e835ea508f2b",
+    "Name": "MacBook Pro 16\"",
+    "Description": "Professional laptop powered by the M3 Max chip.",
+    "Price": 125999.00
+  },
+  {
+    "Id": "b1909e8b-669e-4ed3-b9e4-07a16448ffde",
+    "Name": "Samsung Galaxy S24 Ultra",
+    "Description": "Flagship smartphone featuring Galaxy AI capabilities.",
+    "Price": 57999.00
+  },
+  {
+    "Id": "39aa0d6c-3db0-4fb3-98c5-22cf2097b3d8",
+    "Name": "Sony PlayStation 5",
+    "Description": "Next-generation gaming console with 4K support.",
+    "Price": 22499.00
+  },
+  {
+    "Id": "ade153d4-d310-47f7-8c0e-1006fe34cde8",
+    "Name": "Dell XPS 15",
+    "Description": "Premium ultrabook for work and creativity with an OLED display.",
+    "Price": 85000.00
+  },
+  {
+    "Id": "c79b3e1a-3824-49a1-b013-4e61bcccbb7e",
+    "Name": "Apple Watch Ultra 2",
+    "Description": "Rugged smartwatch designed for extreme sports.",
+    "Price": 35999.00
+  },
+  {
+    "Id": "7ca4e780-e4fd-4430-a08a-2dd55ac022b0",
+    "Name": "Sony WH-1000XM5",
+    "Description": "Wireless headphones with industry-leading active noise cancellation.",
+    "Price": 14999.00
+  },
+  {
+    "Id": "7cdb3512-c726-4c12-ab22-fa1af6cde977",
+    "Name": "Nintendo Switch OLED",
+    "Description": "Handheld gaming console with a vibrant OLED display.",
+    "Price": 15499.00
+  },
+  {
+    "Id": "da5c1e1a-dbae-449c-9d4e-cea7806f6118",
+    "Name": "iPad Pro 13\" (M4)",
+    "Description": "Powerful Apple tablet featuring the innovative Tandem OLED display.",
+    "Price": 64999.00
+  },
+  {
+    "Id": "3398da5a-088c-48f5-a9fa-3081459dc226",
+    "Name": "Asus ROG Zephyrus G14",
+    "Description": "Compact gaming laptop with high-end performance.",
+    "Price": 72500.00
+  },
+  {
+    "Id": "bbf3e491-90a4-4a7a-a013-bed557c9093a",
+    "Name": "Logitech MX Master 3S",
+    "Description": "Ergonomic wireless mouse designed for programmers and creatives.",
+    "Price": 4599.00
+  }
+]

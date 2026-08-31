@@ -15,6 +15,7 @@ namespace Identity.API.Infrastructure.Services
     {
         string CreateToken(ApplicationUser user, IEnumerable<string> roles);
         string CreateRefreshToken();
+        string HashToken(string token);
     }
 
     public class TokenProvider(
@@ -49,6 +50,12 @@ namespace Identity.API.Infrastructure.Services
         public string CreateRefreshToken()
         {
             return Base64UrlEncoder.Encode(RandomNumberGenerator.GetBytes(64));
+        }
+
+        public string HashToken(string token)
+        {
+            var hash = SHA256.HashData(Encoding.UTF8.GetBytes(token));
+            return Convert.ToHexString(hash);
         }
     }
 }

@@ -1,7 +1,11 @@
-﻿using Identity.API.Infrastructure.Services;
+﻿using Identity.API.Infrastructure;
+using Identity.API.Infrastructure.Services;
 using Identity.API.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Identity.API.Apis
 {
@@ -13,6 +17,7 @@ namespace Identity.API.Apis
 
             authGroup.MapPost("login", Login);
             authGroup.MapPost("register", Register);
+            authGroup.MapPost("refresh", Refresh);
 
             return app;
         }
@@ -21,9 +26,11 @@ namespace Identity.API.Apis
         public sealed record LoginResponse(string AccessToken, string RefreshToken);
         public static async Task<Results<Ok<LoginResponse>, UnauthorizedHttpResult>> Login(
             LoginRequest request,
+            UsersDbContext context,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            ITokenProvider tokenProvider)
+            ITokenProvider tokenProvider,
+            CancellationToken ct)
         {
             var user = await userManager.FindByEmailAsync(request.Email);
 
@@ -41,9 +48,9 @@ namespace Identity.API.Apis
             var userRoles = await userManager.GetRolesAsync(user);
 
             var accessToken = tokenProvider.CreateToken(user, userRoles);
-            var refreshToken = tokenProvider.CreateRefreshToken();
+            var refreshTokenValue = await IssueRefreshTokenAsync(context, tokenProvider, user.Id, ct);
 
-            var response = new LoginResponse(accessToken, refreshToken);
+            var response = new LoginResponse(accessToken, refreshTokenValue);
 
             return TypedResults.Ok(response);
         }
@@ -52,8 +59,10 @@ namespace Identity.API.Apis
         public sealed record RegisterResponse(string AccessToken, string RefreshToken);
         public static async Task<Results<Ok<RegisterResponse>, BadRequest<IEnumerable<IdentityError>>>> Register(
             RegisterRequest request,
+            UsersDbContext context,
             UserManager<ApplicationUser> userManager,
-            ITokenProvider tokenProvider)
+            ITokenProvider tokenProvider,
+            CancellationToken ct)
         {
             var user = new ApplicationUser
             {
@@ -71,11 +80,55 @@ namespace Identity.API.Apis
             var userRoles = await userManager.GetRolesAsync(user);
 
             var accessToken = tokenProvider.CreateToken(user, userRoles);
-            var refreshToken = tokenProvider.CreateRefreshToken();
+            var refreshTokenValue = await IssueRefreshTokenAsync(context, tokenProvider, user.Id, ct);
 
-            var response = new RegisterResponse(accessToken, refreshToken);
+            var response = new RegisterResponse(accessToken, refreshTokenValue);
 
             return TypedResults.Ok(response);
+        }
+
+        public sealed record RefreshResponse(string AccessToken, string RefreshToken);
+
+        public static async Task<Results<Ok<RefreshResponse>, UnauthorizedHttpResult>> Refresh(
+            [FromHeader(Name = "X-Refresh-Token")] string refreshTokenValue,
+            UsersDbContext context,
+            UserManager<ApplicationUser> userManager,
+            ITokenProvider tokenProvider,
+            CancellationToken ct)
+        {
+            var tokenHash = tokenProvider.HashToken(refreshTokenValue);
+
+            var refreshToken = await context.RefreshTokens
+                .Include(r => r.User)
+                .FirstOrDefaultAsync(r => r.TokenHash == tokenHash, ct);
+
+            if (refreshToken is null || refreshToken.ExpiresAtUtc < DateTime.UtcNow)
+                return TypedResults.Unauthorized();
+
+            var roles = await userManager.GetRolesAsync(refreshToken.User);
+            var accessToken = tokenProvider.CreateToken(refreshToken.User, roles);
+
+            var newRefreshToken = tokenProvider.CreateRefreshToken();
+            refreshToken.TokenHash = tokenProvider.HashToken(newRefreshToken);
+            refreshToken.ExpiresAtUtc = DateTime.UtcNow.AddDays(7);
+
+            await context.SaveChangesAsync(ct);
+
+            return TypedResults.Ok(new RefreshResponse(accessToken, newRefreshToken));
+        }
+
+        private static async Task<string> IssueRefreshTokenAsync(
+            UsersDbContext context, ITokenProvider tokenProvider, string userId, CancellationToken ct)
+        {
+            var raw = tokenProvider.CreateRefreshToken();
+            context.RefreshTokens.Add(new RefreshToken
+            {
+                UserId = userId,
+                TokenHash = tokenProvider.HashToken(raw),
+                ExpiresAtUtc = DateTime.UtcNow.AddDays(7)
+            });
+            await context.SaveChangesAsync(ct);
+            return raw;
         }
     }
 }

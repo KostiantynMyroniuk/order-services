@@ -30,7 +30,8 @@ namespace Identity.API.Extensions
                 options.User.RequireUniqueEmail = true;
             })
             .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<UsersDbContext>();
+            .AddEntityFrameworkStores<UsersDbContext>()
+            .AddSignInManager();
 
             builder.AddDefaultAuthentication();
         }
