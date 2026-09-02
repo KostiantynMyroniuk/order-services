@@ -4,9 +4,10 @@ services:
       context: .
       dockerfile: src/Catalog.API/Dockerfile
     ports:
-      - "5002:8081"
+      - "5001:8080"
     environment:
       ConnectionStrings__CatalogDb: "Server=sqlserver,1433;Database=CatalogDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+      Jwt__SigningKey: ${JwtSigningKey}
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -15,13 +16,23 @@ services:
     build:
       context: .
       dockerfile: src/Basket.API/Dockerfile
+    ports:
+      - "5002:8080"
+    environment:
+      ConnectionStrings__Cache: "redis:6379"
+      Jwt__SigningKey: ${JwtSigningKey}
+    depends_on:
+      redis:
+        condition: service_healthy
+      catalog.api:
+        condition: service_started
 
   identity.api:
     build:
       context: .
       dockerfile: src/Identity.API/Dockerfile
     ports:
-      - "5001:8080"
+      - "5000:8080"
     environment:
       ConnectionStrings__IdentityDb: "Server=sqlserver,1433;Database=IdentityDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
       Jwt__SigningKey: ${JwtSigningKey}
@@ -36,6 +47,7 @@ services:
   
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
@@ -50,3 +62,14 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5

@@ -11,5 +11,10 @@ namespace Catalog.API.Extensions
             builder.Services.AddDbContext<CatalogDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("CatalogDb")));
         }
+
+        public static void AddGrpcServices(this IHostApplicationBuilder builder)
+        {
+            builder.Services.AddGrpc();
+        }
     }
 }
