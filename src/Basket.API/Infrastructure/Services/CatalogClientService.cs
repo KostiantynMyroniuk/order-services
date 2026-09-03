@@ -27,13 +27,15 @@ namespace Basket.API.Infrastructure.Services
                     new GetProductRequest { ProductId = productId.ToString() },
                     cancellationToken: ct);
 
-                await _db.StringSetAsync(key, JsonSerializer.Serialize(productResponse));
-
-                return new ProductSnapshot(
+                var product = new ProductSnapshot(
                     Guid.Parse(productResponse.ProductId),
                     productResponse.Name,
                     productResponse.Description,
                     decimal.Parse(productResponse.Price));
+
+                await _db.StringSetAsync(key, JsonSerializer.Serialize(product));
+
+                return product;
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
             {

@@ -8,21 +8,32 @@ namespace Basket.API.Infrastructure.Repositories
 {
     public class RedisBasketRepository(
         IConnectionMultiplexer multiplexer,
-        IOptions<RedisOptions> options) : IBasketRepository
+        IOptions<RedisOptions> options,
+        ILogger<RedisBasketRepository> logger) : IBasketRepository
     {
         private readonly IDatabase _db = multiplexer.GetDatabase();
 
-        public async Task<BasketModel?> GetBasketAsync(string userId, CancellationToken ct)
+        public async Task<BasketModel?> GetBasketAsync(string userId, CancellationToken ct = default)
         {
             var basketKey = $"basket:{userId}";
             var json = await _db.StringGetAsync(basketKey);
 
-            return json.HasValue 
-                ? JsonSerializer.Deserialize<BasketModel>(json.ToString()) 
-                : null;
+            if (!json.HasValue)
+                return null;
+
+            try
+            {
+                var basket = JsonSerializer.Deserialize<BasketModel>(json.ToString());
+                return basket;
+            }
+            catch (JsonException ex)
+            {
+                logger.LogError(ex, "Failed to deserialize basket for user {UserId}", userId);
+                throw;
+            }
         }
 
-        public async Task<BasketModel> SaveBasketAsync(BasketModel basket, CancellationToken ct)
+        public async Task<BasketModel> SaveBasketAsync(BasketModel basket, CancellationToken ct = default)
         {
             var basketKey = $"basket:{basket.UserId}";
             await _db.StringSetAsync(
