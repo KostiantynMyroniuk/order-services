@@ -32,7 +32,4 @@ jobs:
 
       - name: Test 
         run: dotnet test ${{ env.SOLUTION_PATH }} --no-restore --no-build
-      
-      - name: Publish
-        run: dotnet publish ${{ env.SOLUTION_PATH }} -c Release --no-restore --no-build
         
