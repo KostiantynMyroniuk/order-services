@@ -1,6 +1,8 @@
 ﻿using Basket.API.Models;
+using Basket.API.Models.Options;
 using Catalog.API.Protos;
 using Grpc.Core;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using System.Text.Json;
 
@@ -8,7 +10,8 @@ namespace Basket.API.Infrastructure.Services
 {
     public class CatalogClientService(
         IConnectionMultiplexer multiplexer,
-        CatalogService.CatalogServiceClient catalogClient) : ICatalogClientService
+        CatalogService.CatalogServiceClient catalogClient,
+        IOptions<RedisOptions> options) : ICatalogClientService
     {
         private readonly IDatabase _db = multiplexer.GetDatabase();
 
@@ -33,7 +36,10 @@ namespace Basket.API.Infrastructure.Services
                     productResponse.Description,
                     decimal.Parse(productResponse.Price));
 
-                await _db.StringSetAsync(key, JsonSerializer.Serialize(product));
+                await _db.StringSetAsync(
+                    key,
+                    JsonSerializer.Serialize(product),
+                    TimeSpan.FromMinutes(options.Value.CatalogCacheTtlMinutes));
 
                 return product;
             }

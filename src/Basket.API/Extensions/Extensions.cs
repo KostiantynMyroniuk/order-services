@@ -1,9 +1,10 @@
-﻿using Basket.API.Infrastructure;
+﻿using Basket.API.Behaviors;
+using Basket.API.Infrastructure;
 using Basket.API.Infrastructure.Repositories;
 using Basket.API.Infrastructure.Services;
 using Basket.API.Models.Options;
-using Basket.API.Services;
 using Catalog.API.Protos;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Shared.Extensions;
 using Shared.Services;
@@ -15,7 +16,15 @@ namespace Basket.API.Extensions
     {
         public static void AddServices(this IHostApplicationBuilder builder)
         {
-            builder.Services.AddScoped<IBasketService, BasketService>();
+            builder.Services.AddValidatorsFromAssembly(typeof(Extensions).Assembly);
+
+            builder.Services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(typeof(Extensions).Assembly);
+
+                cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            });
+
             builder.Services.AddScoped<IBasketRepository, RedisBasketRepository>();
             builder.Services.AddScoped<ICatalogClientService, CatalogClientService>();
         }
@@ -23,11 +32,6 @@ namespace Basket.API.Extensions
         public static void AddPersistence(this IHostApplicationBuilder builder)
         {
             builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection("Basket"));
-            builder.Services.AddStackExchangeRedisCache(options =>
-            {
-                options.Configuration = builder.Configuration.GetConnectionString("Cache") 
-                    ?? throw new InvalidOperationException("Connection string 'Cache' is not configured.");
-            });
 
             builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
                 ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Cache")!) ??

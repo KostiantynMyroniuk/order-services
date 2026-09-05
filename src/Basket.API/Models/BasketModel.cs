@@ -8,7 +8,9 @@ namespace Basket.API.Models
         public string UserId { get; private set; } = default!;
 
         [JsonInclude]
-        public List<BasketItem> Items { get; private set; } = [];
+        [JsonPropertyName("items")]
+        private List<BasketItem> _items = [];
+        public IReadOnlyList<BasketItem> Items => _items.AsReadOnly();
 
         public BasketModel() { }
 
@@ -19,16 +21,19 @@ namespace Basket.API.Models
 
         public void AddItem(BasketItem item)
         {
-            var index = Items.FindIndex(i => i.ProductId == item.ProductId);
-            Items = index >= 0 
-                ? Items.Select((i, n) => n == index ? i with { Quantity = i.Quantity + item.Quantity } : i).ToList() 
-                : [.. Items, item];
+            var index = _items.FindIndex(i => i.ProductId == item.ProductId);
+            _items = index >= 0 
+                ? _items.Select((i, n) => n == index ? i with { Quantity = i.Quantity + item.Quantity } : i).ToList() 
+                : [.. _items, item];
         }
 
         public void DeleteItem(Guid productId)
         {
-            var index = Items.FindIndex(i => i.ProductId == productId);
-            Items.RemoveAt(index);
+            var index = _items.FindIndex(i => i.ProductId == productId);
+
+            if (index < 0) return;
+
+            _items.RemoveAt(index);
         }
     }
 

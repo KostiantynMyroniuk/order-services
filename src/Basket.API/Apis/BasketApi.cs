@@ -1,8 +1,13 @@
-﻿using Basket.API.Models;
-using Basket.API.Services;
+﻿using Basket.API.Features.AddItem;
+using Basket.API.Features.DeleteItem;
+using Basket.API.Features.GetBasket;
+using Basket.API.Models;
+using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Shared.Services;
 using StackExchange.Redis;
+using System.Reflection;
 using System.Text.Json;
 
 namespace Basket.API.Apis
@@ -15,25 +20,24 @@ namespace Basket.API.Apis
                 .RequireAuthorization()
                 .WithTags("Basket");
 
-            basketGroup.MapPost("/items", AddItem);
+            basketGroup.MapPost("items", AddItem);
             basketGroup.MapGet("/", GetBasket);
             basketGroup.MapDelete("items/{productId:guid}", DeleteItem);
         }
 
         public sealed record AddItemRequest(Guid ProductId, int Quantity);
-        public sealed record AddItemResponse();
-        public static async Task<Results<Ok<BasketModel>, NotFound<string>, BadRequest<string>>> AddItem(
-            AddItemRequest request,
-            IBasketService basketService,
-            IIdentityProvider identityProvider, 
-            CancellationToken ct)
+        public sealed record AddItemResponse(IEnumerable<BasketItem> Items);
+        public static async Task<Results<Ok<AddItemResponse>, NotFound<string>, BadRequest<string>>> AddItem(
+            [FromBody] AddItemRequest request,
+            ISender sender,
+            IIdentityProvider identityProvider)
         {
             var userId = identityProvider.GetUserId();
 
-            var result = await basketService.AddItemAsync(userId!, request.ProductId, request.Quantity, ct);
+            var result = await sender.Send(new AddItemCommand(userId!, request.ProductId, request.Quantity));
 
             if (result.IsSuccess)
-                return TypedResults.Ok(result.Value);
+                return TypedResults.Ok(new AddItemResponse(result.Value!.Items));
 
             return result.StatusCode switch
             {
@@ -42,28 +46,26 @@ namespace Basket.API.Apis
             };
         }
 
-        public sealed record GetBasketResponse(List<BasketItem> Items);
+        public sealed record GetBasketResponse(IEnumerable<BasketItem> Items);
         public static async Task<Results<Ok<GetBasketResponse>, BadRequest>> GetBasket(
-            IBasketService basketService,
-            IIdentityProvider identityProvider,
-            CancellationToken ct)
+            ISender sender,
+            IIdentityProvider identityProvider)
         {
             var userId = identityProvider.GetUserId();
 
-            var result = await basketService.GetUserBasketAsync(userId!, ct);
+            var result = await sender.Send(new GetBasketQuery(userId!));
 
             return TypedResults.Ok(new GetBasketResponse(result.Value!.Items));
         }
 
         public static async Task<Results<NoContent, BadRequest>> DeleteItem(
-            Guid productId,
-            IBasketService basketService,
-            IIdentityProvider identityProvider,
-            CancellationToken ct)
+            [FromRoute] Guid productId,
+            ISender sender,
+            IIdentityProvider identityProvider)
         {
             var userId = identityProvider.GetUserId();
 
-            var result = await basketService.DeleteItemAsync(userId!, productId, ct);
+            var result = await sender.Send(new DeleteItemRequest(userId!, productId));
 
             return TypedResults.NoContent();
         }

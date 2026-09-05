@@ -11,7 +11,9 @@
     <Project Path="src/Orders.API/Orders.API.csproj" Id="9f5166b0-ce3b-432e-807d-68882b24689b" />
     <Project Path="src/Shared/Shared.csproj" Id="d5d16ea6-5b47-48db-80e4-c92e82fc1ad3" />
   </Folder>
-  <Folder Name="/tests/" />
+  <Folder Name="/tests/">
+    <Project Path="tests/Basket.UnitTests/Basket.UnitTests.csproj" Id="01dac00a-5309-40c1-9482-0bd8cf5e643f" />
+  </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>
