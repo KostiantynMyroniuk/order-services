@@ -3,11 +3,11 @@ using Basket.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddIdentity();
+builder.AddIdentityConfigurations();
 
 builder.AddServices();
 
-builder.AddPersistence();
+builder.AddPersistenceConfigurations();
 
 builder.AddGrpcServices();
 

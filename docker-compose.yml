@@ -44,6 +44,16 @@ services:
     build:
       context: .
       dockerfile: src/Orders.API/Dockerfile
+    ports:
+      - "5003:8080"
+    environment:
+      ConnectionStrings__OrderDb: "Server=sqlserver,1433;Database=OrderDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+      Jwt__SigningKey: ${JwtSigningKey}
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      catalog.api:
+        condition: service_started
   
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest

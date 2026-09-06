@@ -10,6 +10,7 @@ namespace Catalog.API.Grpc
         public override async Task<ProductResponse> GetProduct(GetProductRequest request, ServerCallContext context)
         {
             var product = await dbContext.Products
+                .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == Guid.Parse(request.ProductId));
 
             if (product is null)

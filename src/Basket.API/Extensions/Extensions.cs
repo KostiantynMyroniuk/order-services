@@ -29,7 +29,7 @@ namespace Basket.API.Extensions
             builder.Services.AddScoped<ICatalogClientService, CatalogClientService>();
         }
 
-        public static void AddPersistence(this IHostApplicationBuilder builder)
+        public static void AddPersistenceConfigurations(this IHostApplicationBuilder builder)
         {
             builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection("Basket"));
 
@@ -47,7 +47,7 @@ namespace Basket.API.Extensions
             });
         }
 
-        public static void AddIdentity(this IHostApplicationBuilder builder)
+        public static void AddIdentityConfigurations(this IHostApplicationBuilder builder)
         {
             builder.Services.AddHttpContextAccessor();
 

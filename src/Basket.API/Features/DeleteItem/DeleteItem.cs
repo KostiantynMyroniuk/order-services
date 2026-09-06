@@ -5,7 +5,7 @@ using Shared.Models;
 
 namespace Basket.API.Features.DeleteItem
 {
-    public sealed record DeleteItemRequest(
+    public record DeleteItemRequest(
         string UserId,
         Guid ProductId) : IRequest<Result<BasketModel>>;
 

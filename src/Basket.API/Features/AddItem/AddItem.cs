@@ -6,7 +6,7 @@ using Shared.Models;
 
 namespace Basket.API.Features.AddItem
 {
-    public sealed record AddItemCommand(
+    public record AddItemCommand(
         string UserId,
         Guid ProductId,
         int Quantity) : IRequest<Result<BasketModel>>;

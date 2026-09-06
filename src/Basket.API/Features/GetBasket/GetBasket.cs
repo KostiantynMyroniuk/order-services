@@ -5,7 +5,7 @@ using Shared.Models;
 
 namespace Basket.API.Features.GetBasket
 {
-    public sealed record GetBasketQuery(string UserId) : IRequest<Result<BasketModel>>;
+    public record GetBasketQuery(string UserId) : IRequest<Result<BasketModel>>;
 
     public class GetBasketQueryHandler(
         IBasketRepository basketRepository) : IRequestHandler<GetBasketQuery, Result<BasketModel>>
