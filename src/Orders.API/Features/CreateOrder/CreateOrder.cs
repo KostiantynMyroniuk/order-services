@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Orders.API.Infrastructure;
+using Orders.API.Infrastructure.Services;
 using Orders.API.Models;
 using Shared.Models;
 
@@ -11,19 +12,40 @@ namespace Orders.API.Features.CreateOrder
         Guid RequestId,
         string UserId,
         Address Address,
-        List<OrderItem> Items) : IRequest<Result<Guid>>;
+        List<OrderItemRequest> Items) : IRequest<Result<Guid>>;
+
+    public sealed record OrderItemRequest(Guid ProductId, int Quantity);
 
     public class CreateOrderCommandHandler(
         OrdersDbContext context,
+        ICatalogClientService catalogClientService,
         ILogger<CreateOrderCommandHandler> logger) : IRequestHandler<CreateOrderCommand, Result<Guid>>
     {
         public async Task<Result<Guid>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
+            var existingOrder = await context.Orders
+                .AsNoTracking()
+                .FirstOrDefaultAsync(o => o.RequestId == request.RequestId, cancellationToken);
+
+            if (existingOrder is not null)
+            {
+                logger.LogInformation(
+                        "Order {OrderId} already exists for RequestId {RequestId}.",
+                        existingOrder.Id,
+                        request.RequestId);
+
+                return Result<Guid>.Success(existingOrder.Id);
+            }
+
+            var confirmedProducts = await catalogClientService.GetProductsByIds(request.Items.Select(i => i.ProductId), cancellationToken);
+            var confirmedProductsDictionary = confirmedProducts.ToDictionary(p => p.ProductId, p => p);
+
             var order = new Order(request.RequestId, request.UserId, request.Address);
 
             foreach (var i in request.Items)
             {
-                order.AddOrderItem(i.ProductId, i.ProductName, i.UnitPrice, i.Quantity);
+                var confirmedProduct = confirmedProductsDictionary[i.ProductId];
+                order.AddOrderItem(i.ProductId, order.Id, confirmedProduct.ProductName, confirmedProduct.Price, i.Quantity);
             }
 
             try
@@ -35,11 +57,11 @@ namespace Orders.API.Features.CreateOrder
             {
                 context.ChangeTracker.Clear();
 
-                var existingOrder = await context.Orders
+                var existingOrderCatched = await context.Orders
                     .AsNoTracking()
                     .FirstOrDefaultAsync(o => o.RequestId == request.RequestId, cancellationToken);
 
-                if (existingOrder is null)
+                if (existingOrderCatched is null)
                 {
                     logger.LogError("Unique constraint violation for requestId {RequestId} but no matching order was found.", request.RequestId);
 
@@ -50,10 +72,10 @@ namespace Orders.API.Features.CreateOrder
 
                 logger.LogInformation(
                         "Order {OrderId} already exists for RequestId {RequestId}.",
-                        existingOrder.Id,
+                        existingOrderCatched.Id,
                         request.RequestId);
 
-                return Result<Guid>.Success(existingOrder.Id);
+                return Result<Guid>.Success(existingOrderCatched.Id);
             }
 
             return Result<Guid>.Success(order.Id);

@@ -13,11 +13,13 @@
 
         public OrderItem(
             Guid productId,
+            Guid orderId,
             string productName,
             decimal unitPrice,
             int quantity)
         {
             ProductId = productId;
+            OrderId = orderId;
             ProductName = productName;
             UnitPrice = unitPrice;
             Quantity = quantity;

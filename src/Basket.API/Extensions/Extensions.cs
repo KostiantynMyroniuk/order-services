@@ -26,7 +26,7 @@ namespace Basket.API.Extensions
             });
 
             builder.Services.AddScoped<IBasketRepository, RedisBasketRepository>();
-            builder.Services.AddScoped<ICatalogClientService, CatalogClientService>();
+            builder.Services.AddScoped<ICatalogClientService, CatalogGrpcClientService>();
         }
 
         public static void AddPersistenceConfigurations(this IHostApplicationBuilder builder)

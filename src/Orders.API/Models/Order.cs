@@ -27,9 +27,14 @@
             CreatedAtUtc = DateTime.UtcNow;
         }
 
-        public void AddOrderItem(Guid productId, string productName, decimal unitPrice, int quantity = 1)
+        public void AddOrderItem(
+            Guid productId,
+            Guid orderId,
+            string productName,
+            decimal unitPrice,
+            int quantity = 1)
         {
-            var orderItem = new OrderItem(productId, productName, unitPrice, quantity);
+            var orderItem = new OrderItem(productId, orderId, productName, unitPrice, quantity);
             _orderItems.Add(orderItem);
         }
 

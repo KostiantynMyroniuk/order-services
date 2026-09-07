@@ -9,6 +9,9 @@ namespace Orders.API.Infrastructure.Configurations
         public void Configure(EntityTypeBuilder<OrderItem> builder)
         {
             builder.HasKey(i => i.ProductId);
+
+            builder.Property(i => i.UnitPrice)
+                .HasPrecision(18, 2);
         }
     }
 }

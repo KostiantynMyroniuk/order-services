@@ -14,6 +14,8 @@ namespace Orders.API.Infrastructure.Configurations
                 .HasForeignKey(i => i.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.OwnsOne(o => o.Address);
+
             builder
                 .HasIndex(o => o.RequestId)
                 .IsUnique();

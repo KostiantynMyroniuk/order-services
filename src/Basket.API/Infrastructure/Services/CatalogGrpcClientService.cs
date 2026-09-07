@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace Basket.API.Infrastructure.Services
 {
-    public class CatalogClientService(
+    public class CatalogGrpcClientService(
         IConnectionMultiplexer multiplexer,
         CatalogService.CatalogServiceClient catalogClient,
         IOptions<RedisOptions> options) : ICatalogClientService

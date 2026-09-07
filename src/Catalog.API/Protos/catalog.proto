@@ -4,6 +4,11 @@ option csharp_namespace = "Catalog.API.Protos";
 
 service CatalogService {
 	rpc GetProduct (GetProductRequest) returns (ProductResponse);
+	rpc GetProducts (GetProductsByIdsRequest) returns (GetProductsByIdsResponse);
+}
+
+message GetProductsByIdsRequest {
+	repeated string productIds = 1;
 }
 
 message GetProductRequest {
@@ -11,6 +16,17 @@ message GetProductRequest {
 }
 
 message ProductResponse {
+	string productId = 1;
+	string name = 2;
+	string description = 3;
+	string price = 4;
+}
+
+message GetProductsByIdsResponse {
+	repeated CatalogProduct products = 1;
+}
+
+message CatalogProduct {
 	string productId = 1;
 	string name = 2;
 	string description = 3;
