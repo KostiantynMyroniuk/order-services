@@ -13,6 +13,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Basket.UnitTests/Basket.UnitTests.csproj" Id="01dac00a-5309-40c1-9482-0bd8cf5e643f" />
+    <Project Path="tests/Orders.UnitTests/Orders.UnitTests.csproj" Id="fe3b79d3-7123-40c4-abb4-dcb4debc5d83" />
   </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />
