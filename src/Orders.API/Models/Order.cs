@@ -1,4 +1,6 @@
-﻿namespace Orders.API.Models
+﻿using Orders.API.Infrastructure.Exceptions;
+
+namespace Orders.API.Models
 {
     public class Order
     {
@@ -41,9 +43,17 @@
         public void SetStatusToShipped()
         {
             if (Status != OrderStatus.Paid)
-                throw new InvalidOperationException(); // set to custom exception
+                throw new OrderDomainException($"Cannot set order status to {OrderStatus.Shipped} when current status is {Status}");
 
             Status = OrderStatus.Shipped;
+        }
+
+        public void SetStatusToCanceled()
+        {
+            if (Status == OrderStatus.Shipped || Status == OrderStatus.Paid)
+                throw new OrderDomainException($"Cannot set order status to {OrderStatus.Canceled} when current status is {Status}");
+
+            Status = OrderStatus.Canceled;
         }
     }
 
@@ -58,6 +68,6 @@
         Submitted = 1, 
         Paid = 2, 
         Shipped = 3, 
-        Cancelled = 4
+        Canceled = 4
     }
 }

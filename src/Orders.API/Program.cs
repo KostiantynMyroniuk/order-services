@@ -21,6 +21,8 @@ if (app.Environment.IsDevelopment())
     await scope.ServiceProvider.GetRequiredService<OrdersDbContext>().Database.MigrateAsync();
 }
 
+app.UseExceptionHandler();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

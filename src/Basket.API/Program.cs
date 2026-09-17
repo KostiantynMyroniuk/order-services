@@ -1,5 +1,6 @@
 using Basket.API.Apis;
 using Basket.API.Extensions;
+using Basket.API.Infrastructure.ExceptionHandling;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,8 @@ builder.AddPersistenceConfigurations();
 builder.AddGrpcServices();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();

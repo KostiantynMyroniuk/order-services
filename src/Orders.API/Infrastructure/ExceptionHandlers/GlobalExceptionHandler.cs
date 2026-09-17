@@ -1,17 +1,18 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Orders.API.Infrastructure.Exceptions;
 
-namespace Basket.API.Infrastructure.Exceptions
+namespace Orders.API.Infrastructure.ExceptionHandlers
 {
-    public class GlobalExceptionsHandler(
-        Logger<GlobalExceptionsHandler> logger) : IExceptionHandler
+    public class GlobalExceptionHandler(
+        IProblemDetailsService problemDetailsService,
+        ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
     {
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
-        {
+        { 
             var (statusCode, problemDetail) = exception switch
             {
-                FluentValidation.ValidationException validationException =>
-                (
+                FluentValidation.ValidationException validationException => (
                     StatusCodes.Status400BadRequest,
                     new ValidationProblemDetails(
                         validationException.Errors
@@ -23,8 +24,18 @@ namespace Basket.API.Infrastructure.Exceptions
                     }
                 ),
 
+                OrderDomainException domainException => (
+                    StatusCodes.Status400BadRequest,
+                    new ProblemDetails()
+                    {
+                        Status = StatusCodes.Status400BadRequest,
+                        Title = "Domain rule violation.",
+                        Detail = domainException.Message
+                    }
+                ),
+
                 _ => (
-                    StatusCodes.Status500InternalServerError, 
+                    StatusCodes.Status500InternalServerError,
                     new ProblemDetails()
                     {
                         Status = StatusCodes.Status500InternalServerError,
@@ -43,9 +54,13 @@ namespace Basket.API.Infrastructure.Exceptions
             }
 
             httpContext.Response.StatusCode = statusCode;
-            await httpContext.Response.WriteAsJsonAsync((object)problemDetail, cancellationToken);
 
-            return true;
+            return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext()
+            {
+                HttpContext = httpContext,
+                ProblemDetails = problemDetail,
+                Exception = exception
+            });
         }
     }
 }

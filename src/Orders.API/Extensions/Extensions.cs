@@ -1,6 +1,8 @@
 ﻿using Catalog.API.Protos;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Orders.API.Infrastructure;
+using Orders.API.Infrastructure.ExceptionHandlers;
 using Orders.API.Infrastructure.Services;
 using Shared.Extensions;
 using Shared.Services;
@@ -11,6 +13,11 @@ namespace Orders.API.Extensions
     {
         public static void AddServices(this IHostApplicationBuilder builder)
         {
+            builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+            builder.Services.AddProblemDetails();
+
+            builder.Services.AddValidatorsFromAssembly(typeof(Extensions).Assembly);
+
             builder.Services.AddMediatR(options =>
             {
                 options.RegisterServicesFromAssembly(typeof(Extensions).Assembly);

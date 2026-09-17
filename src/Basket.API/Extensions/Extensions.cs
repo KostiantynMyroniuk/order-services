@@ -1,5 +1,6 @@
 ﻿using Basket.API.Behaviors;
 using Basket.API.Infrastructure;
+using Basket.API.Infrastructure.ExceptionHandlers;
 using Basket.API.Infrastructure.Repositories;
 using Basket.API.Infrastructure.Services;
 using Basket.API.Models.Options;
@@ -16,6 +17,9 @@ namespace Basket.API.Extensions
     {
         public static void AddServices(this IHostApplicationBuilder builder)
         {
+            builder.Services.AddExceptionHandler<GlobalExceptionsHandler>();
+            builder.Services.AddProblemDetails();
+
             builder.Services.AddValidatorsFromAssembly(typeof(Extensions).Assembly);
 
             builder.Services.AddMediatR(cfg =>
