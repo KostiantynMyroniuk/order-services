@@ -11,7 +11,9 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["Directory.Packages.props", "."]
 COPY ["src/Identity.API/Identity.API.csproj", "src/Identity.API/"]
+COPY ["src/Shared/Shared.csproj", "src/Shared/"]
 RUN dotnet restore "./src/Identity.API/Identity.API.csproj"
 COPY . .
 WORKDIR "/src/src/Identity.API"

@@ -11,7 +11,9 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["Directory.Packages.props", "."]
 COPY ["src/Catalog.API/Catalog.API.csproj", "src/Catalog.API/"]
+COPY ["src/Shared/Shared.csproj", "src/Shared/"]
 RUN dotnet restore "./src/Catalog.API/Catalog.API.csproj"
 COPY . .
 WORKDIR "/src/src/Catalog.API"
