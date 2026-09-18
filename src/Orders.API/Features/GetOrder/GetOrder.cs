@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Orders.API.Infrastructure;
-using Orders.API.Models;
 using Shared.Models;
 
 namespace Orders.API.Features.GetOrder

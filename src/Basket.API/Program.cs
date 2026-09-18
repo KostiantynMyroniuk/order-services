@@ -1,6 +1,5 @@
 using Basket.API.Apis;
 using Basket.API.Extensions;
-using Basket.API.Infrastructure.ExceptionHandling;
 
 var builder = WebApplication.CreateBuilder(args);
 
