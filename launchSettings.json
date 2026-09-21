@@ -7,7 +7,7 @@
         "catalog.api": "StartDebugging",
         "basket.api": "StartDebugging",
         "identityapi": "StartDebugging",
-        "notifications.api": "StartDebugging",
+        "notification.worker": "StartDebugging",
         "orders.api": "StartDebugging"
       }
     }

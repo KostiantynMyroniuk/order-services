@@ -34,7 +34,7 @@ namespace Orders.API.Extensions
         {
             builder.Services.AddGrpcClient<CatalogService.CatalogServiceClient>(options =>
             {
-                options.Address = new Uri(builder.Configuration["ServicesDiscovery:Grpc:CatalogApi"]
+                options.Address = new Uri(builder.Configuration["GrpcSettings:CatalogApi"]
                     ?? throw new InvalidOperationException("Address string 'CatalogApi' is not configured."));
             });
 
