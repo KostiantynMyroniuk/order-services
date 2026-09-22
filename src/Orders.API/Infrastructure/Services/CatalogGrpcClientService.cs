@@ -14,7 +14,10 @@ namespace Orders.API.Infrastructure.Services
 
             request.ProductIds.AddRange(productIds.Select(i => i.ToString()));
 
-            var products = await catalogServiceClient.GetProductsAsync(request, cancellationToken: ct);
+            var products = await catalogServiceClient.GetProductsAsync(
+                request, 
+                deadline: DateTime.UtcNow.AddSeconds(5),
+                cancellationToken: ct);
 
             return products.Products
                 .Select(p => new CatalogItem(

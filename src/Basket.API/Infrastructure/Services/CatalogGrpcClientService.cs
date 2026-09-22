@@ -28,6 +28,7 @@ namespace Basket.API.Infrastructure.Services
             {
                 var productResponse = await catalogClient.GetProductAsync(
                     new GetProductRequest { ProductId = productId.ToString() },
+                    deadline: DateTime.UtcNow.AddSeconds(5),
                     cancellationToken: ct);
 
                 var product = new ProductSnapshot(
