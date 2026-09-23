@@ -12,7 +12,6 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Directory.Packages.props", "."]
 COPY ["src/Notification.Worker/Notification.Worker.csproj", "src/Notification.Worker/"]
-COPY ["src/Shared/Shared.csproj", "src/Shared/"]
 RUN dotnet restore "./src/Notification.Worker/Notification.Worker.csproj"
 COPY . .
 WORKDIR "/src/src/Notification.Worker"

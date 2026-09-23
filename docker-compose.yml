@@ -7,7 +7,7 @@ services:
       - "5001:8080"
     environment:
       ConnectionStrings__CatalogDb: "Server=sqlserver,1433;Database=CatalogDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
-      Jwt__SigningKey: ${JwtSigningKey}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY}
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -20,8 +20,8 @@ services:
       - "5002:8080"
     environment:
       ConnectionStrings__Cache: "redis:6379"
-      Jwt__SigningKey: ${JwtSigningKey}
-      GrpcSettings__CatalogApi: ${CatalogApiUrl}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY}
+      GrpcSettings__CatalogApi: ${CATALOG_API_URL}
     depends_on:
       redis:
         condition: service_healthy
@@ -49,14 +49,30 @@ services:
       - "5003:8080"
     environment:
       ConnectionStrings__OrdersDb: "Server=sqlserver,1433;Database=OrdersDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
-      Jwt__SigningKey: ${JwtSigningKey}
-      GrpcSettings__CatalogApi: ${CatalogApiUrl}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY}
+      GrpcSettings__CatalogApi: ${CATALOG_API_URL}
     depends_on:
       sqlserver:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
       catalog.api:
         condition: service_started
-  
+
+  notification.worker:
+    build:
+      context: .
+      dockerfile: src/Notification.Worker/Dockerfile
+    environment:
+      ConnectionStrings__RabbitMq: "amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672"
+      EmailConfig__SmtpServer: ${SMTP_SERVER}
+      EmailConfig__SmtpPort: ${SMTP_PORT}
+      EmailConfig__FromEmail: ${FROM_EMAIL}
+      EmailConfig__AppPassword: ${APP_PASSWORD}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver

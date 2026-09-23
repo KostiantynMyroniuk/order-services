@@ -36,6 +36,7 @@ namespace Orders.API.Apis
             CancellationToken ct)
         {
             var userId = identityProvider.GetUserId();
+            var userEmail = identityProvider.GetUserEmail();
 
             if (string.IsNullOrEmpty(userId))
                 return TypedResults.BadRequest();
@@ -44,6 +45,7 @@ namespace Orders.API.Apis
                 new CreateOrderCommand(
                     requestId,
                     userId!,
+                    userEmail!,
                     request.Address,
                     request.Items
                         .Select(i => new OrderItemRequest(

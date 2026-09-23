@@ -7,6 +7,7 @@ namespace Shared.Events
     public record OrderCreatedEvent(
         Guid OrderId,
         string UserId,
+        string UserEmail,
         OrderAddress Address);
 
     public record OrderAddress(

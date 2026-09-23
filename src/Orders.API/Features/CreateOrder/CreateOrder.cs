@@ -14,6 +14,7 @@ namespace Orders.API.Features.CreateOrder
     public record CreateOrderCommand(
         Guid RequestId,
         string UserId,
+        string UserEmail,
         Address Address,
         List<OrderItemRequest> Items) : IRequest<Result<Guid>>;
 
@@ -74,6 +75,7 @@ namespace Orders.API.Features.CreateOrder
                 await publishEndpoint.Publish(new OrderCreatedEvent(
                     order.Id,
                     order.UserId,
+                    request.UserEmail,
                     new OrderAddress(
                         order.Address.City,
                         order.Address.Street,

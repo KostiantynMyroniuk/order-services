@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using MassTransit;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -6,6 +7,7 @@ using Orders.API.Features.CreateOrder;
 using Orders.API.Infrastructure;
 using Orders.API.Infrastructure.Services;
 using Orders.API.Models;
+using Shared.Events;
 
 namespace Orders.UnitTests
 {
@@ -15,6 +17,7 @@ namespace Orders.UnitTests
         private readonly OrdersDbContext _context;
         private readonly Mock<ICatalogClientService> _catalogClientMock = new();
         private readonly Mock<ILogger<CreateOrderCommandHandler>> _loggerMock = new();
+        private readonly Mock<IPublishEndpoint> _publishEndpointMock = new();
 
         public CreateOrderHandlerTest()
         {
@@ -35,7 +38,7 @@ namespace Orders.UnitTests
             _sqliteConnection.Dispose();
         }
 
-        private CreateOrderCommandHandler CreateHandler() => new CreateOrderCommandHandler(_context, _catalogClientMock.Object, _loggerMock.Object);
+        private CreateOrderCommandHandler CreateHandler() => new CreateOrderCommandHandler(_context, _catalogClientMock.Object, _publishEndpointMock.Object, _loggerMock.Object);
         private static Address CreateAddress() => new("City1", "Street1", "Country1", "Zipcode1");
 
         [Fact]
@@ -113,6 +116,10 @@ namespace Orders.UnitTests
             _catalogClientMock.Verify(x => 
                 x.GetProductsByIds(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()), 
                 Times.Once);
+
+            _publishEndpointMock.Verify(x => 
+            x.Publish(It.IsAny<OrderCreatedEvent>(), It.IsAny<CancellationToken>()),
+            Times.Once);
         }
     }
 }
