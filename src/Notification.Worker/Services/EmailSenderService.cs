@@ -14,7 +14,7 @@ namespace Notification.Worker.Services
         public required string SmtpServer { get; set; } = "smtp.gmail.com";
         public required int SmtpPort { get; set; } = 587;
         public required string FromEmail { get; set; }
-        public required string AppPasswrod { get; set; }
+        public required string AppPassword { get; set; }
     }
 
     public class EmailSenderService(
@@ -42,7 +42,7 @@ namespace Notification.Worker.Services
 
                 await client.AuthenticateAsync(
                     options.Value.FromEmail,
-                    options.Value.AppPasswrod);
+                    options.Value.AppPassword);
 
                 await client.SendAsync(message);
 

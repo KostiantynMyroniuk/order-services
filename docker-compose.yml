@@ -36,7 +36,7 @@ services:
       - "5000:8080"
     environment:
       ConnectionStrings__IdentityDb: "Server=sqlserver,1433;Database=IdentityDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
-      Jwt__SigningKey: ${JwtSigningKey}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY}
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -49,6 +49,7 @@ services:
       - "5003:8080"
     environment:
       ConnectionStrings__OrdersDb: "Server=sqlserver,1433;Database=OrdersDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+      ConnectionStrings__RabbitMq: "amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672"
       Jwt__SigningKey: ${JWT_SIGNING_KEY}
       GrpcSettings__CatalogApi: ${CATALOG_API_URL}
     depends_on:
@@ -65,10 +66,10 @@ services:
       dockerfile: src/Notification.Worker/Dockerfile
     environment:
       ConnectionStrings__RabbitMq: "amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672"
-      EmailConfig__SmtpServer: ${SMTP_SERVER}
-      EmailConfig__SmtpPort: ${SMTP_PORT}
-      EmailConfig__FromEmail: ${FROM_EMAIL}
-      EmailConfig__AppPassword: ${APP_PASSWORD}
+      EmailConfigs__SmtpServer: ${SMTP_SERVER}
+      EmailConfigs__SmtpPort: ${SMTP_PORT}
+      EmailConfigs__FromEmail: ${FROM_EMAIL}
+      EmailConfigs__AppPassword: ${APP_PASSWORD}
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -117,5 +118,3 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq

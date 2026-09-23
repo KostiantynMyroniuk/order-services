@@ -46,13 +46,14 @@ namespace Orders.UnitTests
         {
             var requestId = Guid.NewGuid();
             var userId = Guid.NewGuid().ToString();
+            var userEmail = "user@example.com";
             var address = CreateAddress();
 
             var existingOrder = new Order(requestId, userId, address);
             _context.Orders.Add(existingOrder);
             await _context.SaveChangesAsync();
 
-            var command = new CreateOrderCommand(requestId, userId, address, [new OrderItemRequest(Guid.NewGuid(), 1)]);
+            var command = new CreateOrderCommand(requestId, userId, userEmail, address, [new OrderItemRequest(Guid.NewGuid(), 1)]);
             var handler = CreateHandler();
 
             var result = await handler.Handle(command, CancellationToken.None);
@@ -70,6 +71,7 @@ namespace Orders.UnitTests
         {
             var requestId = Guid.NewGuid();
             var userId = Guid.NewGuid().ToString();
+            var userEmail = "user@example.com";
             var address = CreateAddress();
 
             var product1Id = Guid.NewGuid();
@@ -93,7 +95,7 @@ namespace Orders.UnitTests
                 new(product2Id, 2)
             };
 
-            var command = new CreateOrderCommand(requestId, userId, address, orderItems);
+            var command = new CreateOrderCommand(requestId, userId, userEmail, address, orderItems);
             var handler = CreateHandler();
 
             var result = await handler.Handle(command, CancellationToken.None);

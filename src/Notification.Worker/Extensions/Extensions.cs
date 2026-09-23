@@ -18,7 +18,7 @@ namespace Notification.Worker.Extensions
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(builder.Configuration.GetConnectionString("RabbitMq"));
-
+                    
                     cfg.ConfigureEndpoints(context);
                 });
             });
