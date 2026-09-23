@@ -1,9 +1,11 @@
 ﻿using Catalog.API.Protos;
 using FluentValidation;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Orders.API.Infrastructure;
-using Orders.API.Infrastructure.ExceptionHandlers;
+using Orders.API.Infrastructure.Exceptions;
 using Orders.API.Infrastructure.Services;
+using Shared.Events;
 using Shared.Extensions;
 using Shared.Services;
 
@@ -21,6 +23,22 @@ namespace Orders.API.Extensions
             builder.Services.AddMediatR(options =>
             {
                 options.RegisterServicesFromAssembly(typeof(Extensions).Assembly);
+            });
+
+            builder.Services.AddMassTransit(x =>
+            {
+                x.AddEntityFrameworkOutbox<OrdersDbContext>(cfg =>
+                {
+                    cfg.UseBusOutbox();
+                    cfg.UseSqlServer();
+                });
+
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(builder.Configuration.GetConnectionString("RabbitMq"));
+
+                    cfg.ConfigureEndpoints(context);
+                });
             });
         }
 

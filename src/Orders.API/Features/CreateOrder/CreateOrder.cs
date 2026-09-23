@@ -1,9 +1,12 @@
-﻿using MediatR;
+﻿using Grpc.Core;
+using MassTransit;
+using MediatR;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Orders.API.Infrastructure;
 using Orders.API.Infrastructure.Services;
 using Orders.API.Models;
+using Shared.Events;
 using Shared.Models;
 
 namespace Orders.API.Features.CreateOrder
@@ -19,6 +22,7 @@ namespace Orders.API.Features.CreateOrder
     public class CreateOrderCommandHandler(
         OrdersDbContext context,
         ICatalogClientService catalogClientService,
+        IPublishEndpoint publishEndpoint,
         ILogger<CreateOrderCommandHandler> logger) : IRequestHandler<CreateOrderCommand, Result<Guid>>
     {
         public async Task<Result<Guid>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -37,7 +41,22 @@ namespace Orders.API.Features.CreateOrder
                 return Result<Guid>.Success(existingOrder.Id);
             }
 
-            var confirmedProducts = await catalogClientService.GetProductsByIds(request.Items.Select(i => i.ProductId), cancellationToken);
+            //Vaidate products from catalog
+
+            IEnumerable<CatalogItem> confirmedProducts;
+
+            try
+            {
+                confirmedProducts = await catalogClientService.GetProductsByIds(request.Items.Select(i => i.ProductId), cancellationToken);
+            }
+            catch (RpcException ex)
+            {
+                logger.LogError(ex, "Error occurred while fetching products from catalog service.");
+                return Result<Guid>.Fail(
+                    StatusCodes.Status404NotFound,
+                    ex.Status.Detail);
+            }
+
             var confirmedProductsDictionary = confirmedProducts.ToDictionary(p => p.ProductId, p => p);
 
             var order = new Order(request.RequestId, request.UserId, request.Address);
@@ -51,6 +70,16 @@ namespace Orders.API.Features.CreateOrder
             try
             {
                 context.Orders.Add(order);
+
+                await publishEndpoint.Publish(new OrderCreatedEvent(
+                    order.Id,
+                    order.UserId,
+                    new OrderAddress(
+                        order.Address.City,
+                        order.Address.Street,
+                        order.Address.Country,
+                        order.Address.ZipCode)));
+
                 await context.SaveChangesAsync(cancellationToken);
             }
             catch (Exception ex) when (IsRequestIdConflict(ex))
@@ -82,7 +111,6 @@ namespace Orders.API.Features.CreateOrder
         }
 
         private static bool IsRequestIdConflict(Exception exception) =>
-            exception is DbUpdateException { InnerException: SqlException { Number: 2601 or 2627 } sqlEx }
-                && sqlEx.Message.Contains("IX_Orders_RequestId", StringComparison.OrdinalIgnoreCase);
+            exception is DbUpdateException { InnerException: SqlException { Number: 2601 or 2627 } sqlEx };
     }
 }

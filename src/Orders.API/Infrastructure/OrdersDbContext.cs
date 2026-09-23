@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Orders.API.Models;
 
 namespace Orders.API.Infrastructure
@@ -15,6 +16,8 @@ namespace Orders.API.Infrastructure
             modelBuilder.HasDefaultSchema("orders");
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(OrdersDbContext).Assembly);
+
+            modelBuilder.AddTransactionalOutboxEntities();
         }
     }
 }

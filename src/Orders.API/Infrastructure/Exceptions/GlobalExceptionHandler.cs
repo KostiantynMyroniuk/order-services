@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Orders.API.Infrastructure.Exceptions;
 
-namespace Orders.API.Infrastructure.ExceptionHandlers
+namespace Orders.API.Infrastructure.Exceptions
 {
     public class GlobalExceptionHandler(
         IProblemDetailsService problemDetailsService,
