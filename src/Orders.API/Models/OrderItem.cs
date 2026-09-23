@@ -2,6 +2,7 @@
 {
     public class OrderItem
     {
+        public Guid Id { get; private set; }
         public Guid ProductId { get; private set; }
         public Guid OrderId { get; set; }
         public string ProductName { get; private set; } = default!;
@@ -18,6 +19,7 @@
             decimal unitPrice,
             int quantity)
         {
+            Id = Guid.CreateVersion7();
             ProductId = productId;
             OrderId = orderId;
             ProductName = productName;

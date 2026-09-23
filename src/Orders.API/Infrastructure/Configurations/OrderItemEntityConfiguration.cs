@@ -8,7 +8,11 @@ namespace Orders.API.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<OrderItem> builder)
         {
-            builder.HasKey(i => i.ProductId);
+            builder.HasIndex(i => new { i.OrderId, i.ProductId })
+                .IsUnique();
+
+            builder.Property(i => i.ProductName)
+                .HasMaxLength(200);
 
             builder.Property(i => i.UnitPrice)
                 .HasPrecision(18, 2);
