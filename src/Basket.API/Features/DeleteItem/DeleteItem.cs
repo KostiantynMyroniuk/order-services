@@ -5,15 +5,15 @@ using Shared.Models;
 
 namespace Basket.API.Features.DeleteItem
 {
-    public record DeleteItemRequest(
+    public record DeleteItemCommand(
         string UserId,
         Guid ProductId) : IRequest<Result<BasketModel>>;
 
-    public class DeleteItemRequestHandler(
+    public class DeleteItemCommandHandler(
         IBasketRepository basketRepository,
-        ILogger<DeleteItemRequestHandler> logger) : IRequestHandler<DeleteItemRequest, Result<BasketModel>>
+        ILogger<DeleteItemCommandHandler> logger) : IRequestHandler<DeleteItemCommand, Result<BasketModel>>
     {
-        public async Task<Result<BasketModel>> Handle(DeleteItemRequest request, CancellationToken cancellationToken)
+        public async Task<Result<BasketModel>> Handle(DeleteItemCommand request, CancellationToken cancellationToken)
         {
             var existingBasket = await basketRepository.GetBasketAsync(request.UserId, cancellationToken);
             var basket = existingBasket ?? new BasketModel(request.UserId);

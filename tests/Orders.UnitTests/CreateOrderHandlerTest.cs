@@ -38,7 +38,7 @@ namespace Orders.UnitTests
             _sqliteConnection.Dispose();
         }
 
-        private CreateOrderCommandHandler CreateHandler() => new CreateOrderCommandHandler(_context, _catalogClientMock.Object, _publishEndpointMock.Object, _loggerMock.Object);
+        private CreateOrderCommandHandler CreateOrderCommandHandler() => new CreateOrderCommandHandler(_context, _catalogClientMock.Object, _publishEndpointMock.Object, _loggerMock.Object);
         private static Address CreateAddress() => new("City1", "Street1", "Country1", "Zipcode1");
 
         [Fact]
@@ -54,7 +54,7 @@ namespace Orders.UnitTests
             await _context.SaveChangesAsync();
 
             var command = new CreateOrderCommand(requestId, userId, userEmail, address, [new OrderItemRequest(Guid.NewGuid(), 1)]);
-            var handler = CreateHandler();
+            var handler = CreateOrderCommandHandler();
 
             var result = await handler.Handle(command, CancellationToken.None);
 
@@ -96,7 +96,7 @@ namespace Orders.UnitTests
             };
 
             var command = new CreateOrderCommand(requestId, userId, userEmail, address, orderItems);
-            var handler = CreateHandler();
+            var handler = CreateOrderCommandHandler();
 
             var result = await handler.Handle(command, CancellationToken.None);
 
@@ -120,8 +120,8 @@ namespace Orders.UnitTests
                 Times.Once);
 
             _publishEndpointMock.Verify(x => 
-            x.Publish(It.IsAny<OrderCreatedEvent>(), It.IsAny<CancellationToken>()),
-            Times.Once);
+                x.Publish(It.IsAny<OrderCreatedEvent>(), It.IsAny<CancellationToken>()),
+                Times.Once);
         }
     }
 }

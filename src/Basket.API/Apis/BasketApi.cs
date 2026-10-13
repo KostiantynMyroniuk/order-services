@@ -65,7 +65,7 @@ namespace Basket.API.Apis
         {
             var userId = identityProvider.GetUserId();
 
-            var result = await sender.Send(new DeleteItemRequest(userId!, productId));
+            var result = await sender.Send(new DeleteItemCommand(userId!, productId));
 
             return TypedResults.NoContent();
         }

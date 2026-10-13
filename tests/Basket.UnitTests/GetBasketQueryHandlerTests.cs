@@ -7,15 +7,23 @@ namespace Basket.UnitTests;
 
 public class GetBasketQueryHandlerTests
 {
+    private readonly Mock<IBasketRepository> _basketRepoMock;
+
+    public GetBasketQueryHandlerTests()
+    {
+        _basketRepoMock = new Mock<IBasketRepository>();
+    }
+
+    private GetBasketQueryHandler CreateGetBasketQueryHandler() => new GetBasketQueryHandler(_basketRepoMock.Object);
+
     [Fact]
     public async Task Handle_WhenBasketIsMissing_ReturnsEmptyBasketForUser()
     {
-        var basketRepository = new Mock<IBasketRepository>();
-        basketRepository
+        _basketRepoMock
             .Setup(x => x.GetBasketAsync("user-1", It.IsAny<CancellationToken>()))
             .ReturnsAsync((BasketModel?)null);
 
-        var handler = new GetBasketQueryHandler(basketRepository.Object);
+        var handler = CreateGetBasketQueryHandler();
 
         var result = await handler.Handle(new GetBasketQuery("user-1"), CancellationToken.None);
 
