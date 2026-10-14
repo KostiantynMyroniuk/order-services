@@ -1,4 +1,5 @@
-﻿using Basket.API.Features.AddItem;
+﻿using Asp.Versioning;
+using Basket.API.Features.AddItem;
 using Basket.API.Features.DeleteItem;
 using Basket.API.Features.GetBasket;
 using Basket.API.Models;
@@ -16,13 +17,30 @@ namespace Basket.API.Apis
     {
         public static void MapBasketApi(this IEndpointRouteBuilder app)
         {
-            var basketGroup = app.MapGroup("api/basket")
+            var api = app.NewVersionedApi("Basket")
                 .RequireAuthorization()
                 .WithTags("Basket");
 
-            basketGroup.MapPost("items", AddItem);
-            basketGroup.MapGet("/", GetBasket);
-            basketGroup.MapDelete("items/{productId:guid}", DeleteItem);
+            var v1 = api.MapGroup("api/v{version:apiVersion}/basket").HasApiVersion(new ApiVersion(1, 0));
+            var v2 = api.MapGroup("api/v{version:apiVersion}/basket").HasApiVersion(new ApiVersion(2, 0));
+
+            v1.MapPost("items", AddItem)
+                .WithName("AddItem")
+                .WithSummary("Add item to the basket")
+                .WithDescription("Endpoint for adding item to the basket")
+                .WithTags("UserBasket");
+
+            v1.MapGet("/", GetBasket)
+                .WithName("GetBasket")
+                .WithSummary("Get user basket")
+                .WithDescription("Endpoint for getting user basket")
+                .WithTags("UserBasket");
+
+            v1.MapDelete("items/{productId:guid}", DeleteItem)
+                .WithName("DeleteItem")
+                .WithSummary("Delete item from the basket")
+                .WithDescription("Endpoint for deleting item from the basket")
+                .WithTags("UserBasket");
         }
 
         public sealed record AddItemRequest(Guid ProductId, int Quantity);

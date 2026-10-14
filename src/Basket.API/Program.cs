@@ -11,6 +11,8 @@ builder.AddPersistenceConfigurations();
 
 builder.AddGrpcServices();
 
+builder.AddApiVersioning();
+
 var app = builder.Build();
 
 app.UseExceptionHandler();

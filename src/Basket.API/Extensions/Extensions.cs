@@ -1,4 +1,5 @@
-﻿using Basket.API.Behaviors;
+﻿using Asp.Versioning;
+using Basket.API.Behaviors;
 using Basket.API.Infrastructure;
 using Basket.API.Infrastructure.ExceptionHandlers;
 using Basket.API.Infrastructure.Repositories;
@@ -58,6 +59,22 @@ namespace Basket.API.Extensions
             builder.AddDefaultAuthentication();
 
             builder.Services.AddScoped<IIdentityProvider, IdentityProvider>();
+        }
+
+        public static void AddApiVersioning(this IHostApplicationBuilder builder)
+        {
+            builder.Services.AddApiVersioning(o =>
+            {
+                o.DefaultApiVersion = new ApiVersion(1, 0);
+                o.AssumeDefaultVersionWhenUnspecified = true;
+                o.ReportApiVersions = true;
+                o.ApiVersionReader = new UrlSegmentApiVersionReader();
+            })
+            .AddApiExplorer(o => 
+            {
+                o.SubstituteApiVersionInUrl = true;
+                o.GroupNameFormat = "'v'VVV";
+            });
         }
     }
 }
